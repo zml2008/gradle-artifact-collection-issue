@@ -1,0 +1,41 @@
+allprojects {
+    group = 'ca.stellardrift'
+    version = '1.0.0-SNAPSHOT'
+}
+
+configurations {
+    something
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    something 'com.google.code.gson:gson:2.8.8'
+    something project(':testproject')
+}
+
+def inputCollection = configurations.something.incoming
+  .artifactView(view -> {
+    view.componentFilter(c -> c instanceof ProjectComponentIdentifier && ((ProjectComponentIdentifier) c).getBuild().isCurrentBuild()); // only in-project, and not included builds
+    view.setLenient(true); // ignore artifacts with no javadoc elements variant
+  }).artifacts
+
+abstract class ResolveArtifacts extends DefaultTask {
+    @Input
+    abstract Property<ArtifactCollection> getCollection();
+    
+   @TaskAction
+   void doRun() {
+       logger.lifecycle "Resolving artifacts:"
+        collection.get().each {
+            logger.lifecycle "- ${it.id}: ${it.file}".toString()
+        }
+   } 
+    
+}
+
+tasks.register('resolveArtifacts', ResolveArtifacts) {
+    collection = inputCollection
+}

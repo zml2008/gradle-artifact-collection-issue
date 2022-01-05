@@ -1,1 +1,3 @@
-rootProject.name = 'reproducer-project'
+rootProject.name = 'gradle-artifact-collection-issue'
+
+include 'testproject'
