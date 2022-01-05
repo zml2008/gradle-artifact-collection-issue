@@ -26,11 +26,18 @@ abstract class ResolveArtifacts extends DefaultTask {
     @Input
     abstract Property<ArtifactCollection> getCollection();
     
+    @OutputFile
+    abstract RegularFileProperty getDestination()
+    
    @TaskAction
    void doRun() {
        logger.lifecycle "Resolving artifacts:"
         collection.get().each {
             logger.lifecycle "- ${it.id}: ${it.file}".toString()
+        }
+        
+        destination.get().asFile.withWriter('utf-8') {
+            it.writeLine "hello world"
         }
    } 
     
@@ -38,4 +45,5 @@ abstract class ResolveArtifacts extends DefaultTask {
 
 tasks.register('resolveArtifacts', ResolveArtifacts) {
     collection = inputCollection
+    destination = project.layout.buildDirectory.file('test.txt')
 }
